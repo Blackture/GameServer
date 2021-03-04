@@ -10,6 +10,7 @@ namespace GameServer
     class Client
     {
         public static int dataBufferSize = 4096;
+
         public int id;
         public Player player;
         public TCP tcp;
@@ -25,7 +26,7 @@ namespace GameServer
         public class TCP
         {
             public TcpClient socket;
-            
+
             private readonly int id;
             private NetworkStream stream;
             private Packet receivedData;
@@ -36,7 +37,7 @@ namespace GameServer
                 id = _id;
             }
 
-            public void Connect(TcpClient _socket) 
+            public void Connect(TcpClient _socket)
             {
                 socket = _socket;
                 socket.ReceiveBufferSize = dataBufferSize;
@@ -61,9 +62,9 @@ namespace GameServer
                         stream.BeginWrite(_packet.ToArray(), 0, _packet.Length(), null, null);
                     }
                 }
-                catch (Exception e)
+                catch (Exception _ex)
                 {
-                    Console.WriteLine($"Error sending data to player {id} via TCP: {e}");
+                    Console.WriteLine($"Error sending data to player {id} via TCP: {_ex}");
                 }
             }
 
@@ -74,6 +75,7 @@ namespace GameServer
                     int _byteLength = stream.EndRead(_result);
                     if (_byteLength <= 0)
                     {
+                        // TODO: disconnect
                         return;
                     }
 
@@ -83,10 +85,10 @@ namespace GameServer
                     receivedData.Reset(HandleData(_data));
                     stream.BeginRead(receiveBuffer, 0, dataBufferSize, ReceiveCallback, null);
                 }
-                catch (Exception e)
+                catch (Exception _ex)
                 {
-
-                    Console.WriteLine($"Error receiving TCP data: {e}");
+                    Console.WriteLine($"Error receiving TCP data: {_ex}");
+                    // TODO: disconnect
                 }
             }
 
@@ -148,9 +150,9 @@ namespace GameServer
                 id = _id;
             }
 
-            public void Connect(IPEndPoint _endpoint)
+            public void Connect(IPEndPoint _endPoint)
             {
-                endPoint = _endpoint;
+                endPoint = _endPoint;
             }
 
             public void SendData(Packet _packet)

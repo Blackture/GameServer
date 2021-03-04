@@ -27,18 +27,18 @@ namespace GameServer
 
             tcpListener = new TcpListener(IPAddress.Any, Port);
             tcpListener.Start();
-            tcpListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectCallback), null);
+            tcpListener.BeginAcceptTcpClient(TCPConnectCallback, null);
 
             udpListener = new UdpClient(Port);
             udpListener.BeginReceive(UDPReceiveCallback, null);
 
-            Console.WriteLine($"Server started on port {Port}");
+            Console.WriteLine($"Server started on port {Port}.");
         }
 
         private static void TCPConnectCallback(IAsyncResult _result)
         {
             TcpClient _client = tcpListener.EndAcceptTcpClient(_result);
-            tcpListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectCallback), null);
+            tcpListener.BeginAcceptTcpClient(TCPConnectCallback, null);
             Console.WriteLine($"Incoming connection from {_client.Client.RemoteEndPoint}...");
 
             for (int i = 1; i <= MaxPlayers; i++)
@@ -70,7 +70,7 @@ namespace GameServer
                 {
                     int _clientId = _packet.ReadInt();
 
-                    if (_clientId == 0) 
+                    if (_clientId == 0)
                     {
                         return;
                     }
@@ -87,9 +87,9 @@ namespace GameServer
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception _ex)
             {
-                Console.WriteLine($"Error receiving UDP data: {e}");
+                Console.WriteLine($"Error receiving UDP data: {_ex}");
             }
         }
 
@@ -102,9 +102,9 @@ namespace GameServer
                     udpListener.BeginSend(_packet.ToArray(), _packet.Length(), _clientEndPoint, null, null);
                 }
             }
-            catch (Exception e)
+            catch (Exception _ex)
             {
-                Console.WriteLine($"Error sending data to {_clientEndPoint} via UDP: {e}");
+                Console.WriteLine($"Error sending data to {_clientEndPoint} via UDP: {_ex}");
             }
         }
 
@@ -117,9 +117,9 @@ namespace GameServer
 
             packetHandlers = new Dictionary<int, PacketHandler>()
             {
-                { (int)ClientPackets.welcomeReceived, ServerHandle.WelcomeReceived }
+                { (int)ClientPackets.welcomeReceived, ServerHandle.WelcomeReceived },
             };
-            Console.WriteLine("Initialized packets");
+            Console.WriteLine("Initialized packets.");
         }
     }
 }
